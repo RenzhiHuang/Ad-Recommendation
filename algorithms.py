@@ -13,21 +13,22 @@ def UCB(data, partial):
 	n = np.ones(m)
 	regret = np.ones(T)
 	regret_t = np.ones(T)
+	reward = np.zeros(T)
 	for t in range(1,T):
 		UCB = mu + np.sqrt(2*np.log(t)/n)
-		observed_arm = np.argmax(UCB)
-		y_t = data[observed_arm,t]
-		regret[t] = regret[t-1]+ (np.max(mu)-mu[observed_arm])
+		i_t = np.argmax(UCB)
+		r_t = data[i_t,t]
+		reward[t] = reward[t-1]+r_t
+		regret[t] = regret[t-1]+ (np.max(mu)-mu[i_t])
 		regret_t[t] = regret[t]/t
-		print(np.max(mu)-mu[observed_arm])
 		if(partial):
-			n[observed_arm] = n[observed_arm]+1
-			mu[observed_arm] = mu[observed_arm]+(y_t-mu[observed_arm])/n[observed_arm]
+			n[i_t] = n[i_t]+1
+			mu[i_t] = mu[i_t]+(r_t-mu[i_t])/n[i_t]
 		else:
 			n = n+1
 			mu = mu+(data[:,t]-mu)/n
 
-	return regret, regret_t
+	return regret, regret_t, reward
 
 
 def Thompson_sampling(data,partial):
@@ -40,14 +41,18 @@ def Thompson_sampling(data,partial):
 	F = np.zeros(m)
 	regret = np.ones(T)
 	regret_t = np.ones(T)
+	reward = np.zeros(T)
 	for t in range(0,T):
 		theta = np.random.beta(S+1,F+1)
 		i_t = np.argmax(theta)
 		r_t = data[i_t,t]
 		if(t>0):
+			reward[t] = reward[t-1]+r_t
 			mu = S/(S+F)
 			regret[t] = regret[t-1]+ (np.max(mu)-mu[i_t])
 			regret_t[t] = regret[t]/t
+		else:
+			reward[t] = r_t
 		if(r_t==1):
 			if(partial):
 				S[i_t]=S[i_t]+1
@@ -58,7 +63,7 @@ def Thompson_sampling(data,partial):
 				F[i_t]=F[i_t]+1
 			else:
 				F = F + (1-data[:,t])
-	return regret, regret_t
+	return regret, regret_t, reward
 
 
 
