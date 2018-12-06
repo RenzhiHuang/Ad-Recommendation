@@ -17,11 +17,15 @@ mu = np.mean(data,axis = 1)
 best_choice = np.argmax(mu)
 highest_mean = np.max(mu)
 print(highest_mean)
+print(np.sort(mu))
+
+round_sum = np.sum(data,axis=0)
+print(np.max(round_sum))
 
 
 # test algorithms
-#regret = UCB(data,partial)
-regret = Thompson_sampling(data,partial)
+regret, regret_t = UCB(data,partial)
+#regret, regret_t = Thompson_sampling(data,partial)
 print(regret)
-plt.plot(regret)
+plt.plot(regret_t)
 plt.show()
