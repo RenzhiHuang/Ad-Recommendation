@@ -31,9 +31,10 @@ def UCB(data, partial):
 	return regret
 
 
-def Thompson_sampling(data):
+def Thompson_sampling(data,partial):
 	'''
 	data: 50 x 32657 numpy array
+	partial: boolean to indicate if it is partial feedback or full feedback
 	'''
 	m,T = data.shape
 	S = np.zeros(m)
@@ -44,10 +45,16 @@ def Thompson_sampling(data):
 		i_t = np.argmax(theta)
 		r_t = data[i_t,t]
 		if(r_t==1):
-			S[i_t]=S[i_t]+1
+			if(partial):
+				S[i_t]=S[i_t]+1
+			else:
+				S = S + data[:,t]
 			regret[t] = regret[t-1]
 		else:
-			F[i_t]=F[i_t]+1
+			if(partial):
+				F[i_t]=F[i_t]+1
+			else:
+				F = F + (1-data[:,t])
 			regret[t] = regret[t-1]+1
 	return regret
 

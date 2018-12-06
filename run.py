@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # parameters to be set
 path = './yahoo_ad_clicks.csv'
-partial = True # True to be partial feedback, False to be full feedback
+partial = False # True to be partial feedback, False to be full feedback
 
 # data import
 data = data_import(path)
@@ -21,7 +21,7 @@ print(highest_mean)
 
 # test algorithms
 #regret = UCB(data,partial)
-regret = Thompson_sampling(data)
+regret = Thompson_sampling(data,partial)
 print(regret)
 plt.plot(regret)
 plt.show()
