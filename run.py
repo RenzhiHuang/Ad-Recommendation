@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # parameters to be set
 path = './yahoo_ad_clicks.csv'
 partial = True # True to be partial feedback, False to be full feedback
-initial_rounds = 10000# number of rounds to initialize the mu
+alpha = 2 # larger alpha indicates more preference to exploration
 
 # data import
 data = data_import(path)
@@ -25,11 +25,10 @@ print(np.max(round_sum))
 
 
 # test algorithms
-#regret, regret_t,reward = UCB_pro(data,initial_rounds)
-#regret, regret_t,reward = UCB(data,partial)
-regret, regret_t, reward = Thompson_sampling(data,partial)
+regret, regret_t,reward = UCB(data,partial,alpha)
+#regret, regret_t, reward = Thompson_sampling(data,partial)
 print(reward)
 print(regret)
 print(regret_t)
-plt.plot(regret_t)
+plt.plot(regret)
 plt.show()

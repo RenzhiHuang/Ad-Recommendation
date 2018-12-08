@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-def UCB(data, partial):
+def UCB(data, partial,alpha):
 	'''
 	data: 50 x 32657 numpy array
 	partial: boolean to indicate if it is partial feedback or full feedback
@@ -14,8 +14,9 @@ def UCB(data, partial):
 	regret = np.ones(T)
 	regret_t = np.ones(T)
 	reward = np.zeros(T)
+	ads = [x for x in range(m)]
 	for t in range(1,T):
-		UCB = mu + np.sqrt(2*np.log(t)/n)
+		UCB = mu + np.sqrt(alpha*np.log(t)/2/n)
 		i_t = np.argmax(UCB)
 		r_t = data[i_t,t]
 		reward[t] = reward[t-1]+r_t
@@ -46,7 +47,7 @@ def UCB_pro(data, initial_rounds):
 	ads = [x for x in range(m)]
 	for t in range(initial_rounds,T):
 		UCB = mu + np.sqrt(2*np.log(t)/n)
-		UCB = UCB / np.sum(UCB)
+		#UCB = UCB / np.sum(UCB)
 		#i_t = np.random.choice(ads,p=UCB)
 		i_t = np.argmax(UCB)
 		r_t = data[i_t,t]
