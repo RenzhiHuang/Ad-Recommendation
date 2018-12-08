@@ -1,24 +1,34 @@
 import numpy as np
 import random
 
-def epsilon_greedy(data, epsilon):
+def epsilon_greedy(data, epsilon=None):
 
 	m,T = data.shape
+	n = np.zeros(m)
 	mu = np.zeros(m)
-	for i in range(T):
-		if np.random.random()>epsilon:
-			if max(mu) > 0:
-				choice = mu.index(max(mu))
-			else:
-				choice = np.random.randint(m)
 
+	regret = np.ones(T)
+	regret_t = np.ones(T)
+	reward = np.zeros(T)
+	for t in range(1,T):
+		if epsilon is None:
+			epsilon = 1/t
+		if np.random.random()>epsilon:
+			if max(mu)==0:
+				choice = np.random.randint(m)
+			else:
+				choice = np.argmax(mu)
 		else:
 			choice = np.random.randint(m)
 
-		mu[choice] +=1
+		reward[t] = reward[t-1]+data[choice,t]
+		regret[t] = regret[t-1]+ (np.max(mu)-mu[choice])
+		regret_t[t] = regret[t]/t
 
-	return mu/sum(mu)
+		n[choice] += 1
+		mu[choice] += ((n[choice]-1)*mu[choice]+data[choice,t])/n[choice]
 
+	return regret, regret_t, reward
 
 def UCB(data, partial,alpha):
 	'''
