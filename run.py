@@ -3,7 +3,8 @@ from algorithms import *
 import matplotlib.pyplot as plt
 
 # parameters to be set
-path = './yahoo_ad_clicks.csv'
+path = 
+# path = './yahoo_ad_clicks.csv'
 partial = True # True to be partial feedback, False to be full feedback
 alpha = 2 # larger alpha indicates more preference to exploration
 
@@ -27,8 +28,8 @@ print(np.max(round_sum))
 # test algorithms
 regret, regret_t,reward = UCB(data,partial,alpha)
 #regret, regret_t, reward = Thompson_sampling(data,partial)
-print(reward)
-print(regret)
-print(regret_t)
-plt.plot(regret)
+print(reward[-10:])
+print(regret[-10:])
+print(regret_t[-10:])
+plt.plot(regret[20:])
 plt.show()

@@ -1,6 +1,25 @@
 import numpy as np
 import random
 
+def epsilon_greedy(data, epsilon):
+
+	m,T = data.shape
+	mu = np.zeros(m)
+	for i in range(T):
+		if np.random.random()>epsilon:
+			if max(mu) > 0:
+				choice = mu.index(max(mu))
+			else:
+				choice = np.random.randint(m)
+
+		else:
+			choice = np.random.randint(m)
+
+		mu[choice] +=1
+
+	return mu/sum(mu)
+
+
 def UCB(data, partial,alpha):
 	'''
 	data: 50 x 32657 numpy array
