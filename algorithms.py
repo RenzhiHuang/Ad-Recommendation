@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-def epsilon_greedy(data, epsilon=None):
+def epsilon_greedy(data, best_arm, epsilon=None):
 
 	m,T = data.shape
 	n = np.zeros(m)
@@ -10,6 +10,7 @@ def epsilon_greedy(data, epsilon=None):
 	regret = np.ones(T)
 	regret_t = np.ones(T)
 	reward = np.zeros(T)
+	reward_best = np.zeros(T)
 	for t in range(1,T):
 		if epsilon is None:
 			epsilon = 1/t
@@ -22,7 +23,8 @@ def epsilon_greedy(data, epsilon=None):
 			choice = np.random.randint(m)
 
 		reward[t] = reward[t-1]+data[choice,t]
-		regret[t] = regret[t-1]+ (np.max(mu)-mu[choice])
+		reward_best[t] = reward_best[t-1] + data[best_arm,t]
+		regret[t] = (reward_best[t] - reward_UCB[t])/t
 		regret_t[t] = regret[t]/t
 		n[choice] += 1
 		mu[choice] += ((n[choice]-1)*mu[choice]+data[choice,t])/n[choice]
@@ -49,7 +51,8 @@ def UCB(data, partial,alpha,best_arm):
 		r_t = data[i_t,t]
 		reward_UCB[t] = reward_UCB[t-1] + r_t
 		reward_best[t] = reward_best[t-1] + data[best_arm,t]
-		regret[t] = regret[t-1]+(reward_best[t] - reward_UCB[t])/t
+		# regret[t] = regret[t-1]+(reward_best[t] - reward_UCB[t])/t
+		regret[t] = (reward_best[t] - reward_UCB[t])/t
 		regret_t[t] = regret[t]/t
 		if(partial):
 			n[i_t] = n[i_t]+1
