@@ -24,13 +24,12 @@ def epsilon_greedy(data, epsilon=None):
 		reward[t] = reward[t-1]+data[choice,t]
 		regret[t] = regret[t-1]+ (np.max(mu)-mu[choice])
 		regret_t[t] = regret[t]/t
-
 		n[choice] += 1
 		mu[choice] += ((n[choice]-1)*mu[choice]+data[choice,t])/n[choice]
 
 	return regret, regret_t, reward
 
-def UCB(data, partial,alpha,mu_star):
+def UCB(data, partial,alpha,best_arm):
 	'''
 	data: 50 x 32657 numpy array
 	partial: boolean to indicate if it is partial feedback or full feedback
@@ -42,14 +41,15 @@ def UCB(data, partial,alpha,mu_star):
 	n = np.ones(m)
 	regret = np.zeros(T)
 	regret_t = np.zeros(T)
-	reward = np.zeros(T)
-	ads = [x for x in range(m)]
+	reward_UCB = np.zeros(T)
+	reward_best = np.zeros(T)
 	for t in range(1,T):
 		UCB = mu + np.sqrt(alpha*np.log(t)/2/n)
 		i_t = np.argmax(UCB)
 		r_t = data[i_t,t]
-		reward[t] = reward[t-1]+r_t
-		regret[t] = regret[t-1]+ (mu_star-mu[i_t])
+		reward_UCB[t] = reward_UCB[t-1] + r_t
+		reward_best[t] = reward_best[t-1] + data[best_arm,t]
+		regret[t] = regret[t-1]+(reward_best[t] - reward_UCB[t])/t
 		regret_t[t] = regret[t]/t
 		if(partial):
 			n[i_t] = n[i_t]+1
@@ -58,7 +58,7 @@ def UCB(data, partial,alpha,mu_star):
 			n = n+1
 			mu = mu+(data[:,t]-mu)/n
 
-	return regret, regret_t, reward
+	return regret, regret_t, reward_UCB
 
 def UCB_pro(data, initial_rounds):
 	'''
@@ -89,7 +89,7 @@ def UCB_pro(data, initial_rounds):
 	return regret, regret_t, reward
 
 
-def Thompson_sampling(data,partial,mu_star):
+def Thompson_sampling(data,partial,best_arm):
 	'''
 	data: 50 x 32657 numpy array
 	partial: boolean to indicate if it is partial feedback or full feedback
@@ -97,22 +97,23 @@ def Thompson_sampling(data,partial,mu_star):
 	m,T = data.shape
 	S = np.zeros(m)
 	F = np.zeros(m)
-	regret = np.ones(T)
-	regret_t = np.ones(T)
-	reward = np.zeros(T)
+	regret = np.zeros(T)
+	regret_t = np.zeros(T)
+	reward_Tho = np.zeros(T)
+	reward_best = np.zeros(T)
 	for t in range(0,T):
 		theta = np.random.beta(S+1,F+1)
 		i_t = np.argmax(theta)
 		r_t = data[i_t,t]
+
 		if(t>0):
-			reward[t] = reward[t-1]+r_t
-			untested = np.where(S+F==0)
-			mu = S/(S+F)
-			mu[untested] = 0
-			regret[t] = regret[t-1]+ (mu_star-mu[i_t])
+			reward_Tho[t] = reward_Tho[t-1] + r_t
+			reward_best[t] = reward_best[t-1] + data[best_arm,t]
+			regret[t] = regret[t-1]+(reward_best[t] - reward_Tho[t])/t
 			regret_t[t] = regret[t]/t
 		else:
-			reward[t] = r_t
+			reward_Tho[t] = r_t
+			reward_best[t] = data[best_arm,t]
 		if(r_t==1):
 			if(partial):
 				S[i_t]=S[i_t]+1
@@ -123,7 +124,7 @@ def Thompson_sampling(data,partial,mu_star):
 				F[i_t]=F[i_t]+1
 			else:
 				F = F + (1-data[:,t])
-	return regret, regret_t, reward
+	return regret, regret_t, reward_Tho
 
 
 
