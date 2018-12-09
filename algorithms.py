@@ -30,7 +30,7 @@ def epsilon_greedy(data, epsilon=None):
 
 	return regret, regret_t, reward
 
-def UCB(data, partial,alpha):
+def UCB(data, partial,alpha,mu_star):
 	'''
 	data: 50 x 32657 numpy array
 	partial: boolean to indicate if it is partial feedback or full feedback
@@ -40,8 +40,8 @@ def UCB(data, partial,alpha):
 	mu = data[:,0].astype(np.float)
 	# the test number 
 	n = np.ones(m)
-	regret = np.ones(T)
-	regret_t = np.ones(T)
+	regret = np.zeros(T)
+	regret_t = np.zeros(T)
 	reward = np.zeros(T)
 	ads = [x for x in range(m)]
 	for t in range(1,T):
@@ -49,7 +49,7 @@ def UCB(data, partial,alpha):
 		i_t = np.argmax(UCB)
 		r_t = data[i_t,t]
 		reward[t] = reward[t-1]+r_t
-		regret[t] = regret[t-1]+ (np.max(mu)-mu[i_t])
+		regret[t] = regret[t-1]+ (mu_star-mu[i_t])
 		regret_t[t] = regret[t]/t
 		if(partial):
 			n[i_t] = n[i_t]+1
@@ -89,7 +89,7 @@ def UCB_pro(data, initial_rounds):
 	return regret, regret_t, reward
 
 
-def Thompson_sampling(data,partial):
+def Thompson_sampling(data,partial,mu_star):
 	'''
 	data: 50 x 32657 numpy array
 	partial: boolean to indicate if it is partial feedback or full feedback
@@ -109,7 +109,7 @@ def Thompson_sampling(data,partial):
 			untested = np.where(S+F==0)
 			mu = S/(S+F)
 			mu[untested] = 0
-			regret[t] = regret[t-1]+ (np.max(mu)-mu[i_t])
+			regret[t] = regret[t-1]+ (mu_star-mu[i_t])
 			regret_t[t] = regret[t]/t
 		else:
 			reward[t] = r_t

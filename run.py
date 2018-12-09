@@ -18,8 +18,8 @@ def plot_(data, output_path, num_skip = 20, name = 'regret'):
 	plt.close()
 
 # parameters to be set
-path = '/Users/galaxydirector/Desktop/Ad-Recommendation/yahoo_ad_clicks.csv'
-# path = './yahoo_ad_clicks.csv'
+#path = '/Users/galaxydirector/Desktop/Ad-Recommendation/yahoo_ad_clicks.csv'
+path = './yahoo_ad_clicks.csv'
 partial = True # True to be partial feedback, False to be full feedback
 alpha = 2 # larger alpha indicates more preference to exploration
 
@@ -32,7 +32,7 @@ print(data.shape) # 50 x 32657
 m,T = data.shape
 mu = np.mean(data,axis = 1)
 best_choice = np.argmax(mu)
-highest_mean = np.max(mu)
+mu_star = np.max(mu)
 #print(highest_mean)
 #print(np.sort(mu))
 
@@ -42,8 +42,8 @@ print(np.max(round_sum))
 
 # test algorithms
 # regret, regret_t,reward = epsilon_greedy(data, epsilon=None)
-# regret, regret_t,reward = UCB(data,partial,alpha)
-regret, regret_t, reward = Thompson_sampling(data,partial)
+regret_t,reward = UCB(data,partial,alpha,mu_star)
+#regret, regret_t, reward = Thompson_sampling(data,partial, mu_star)
 
 # for e in range(2,10,2):
 # 	regret, regret_t,reward = epsilon_greedy(data, epsilon=e/10)
