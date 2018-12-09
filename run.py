@@ -30,9 +30,11 @@ print(data.shape) # 50 x 32657
 
 # gain some knowledge about the data
 m,T = data.shape
+reward =  np.sum(data,axis = 1)
 mu = np.mean(data,axis = 1)
 best_choice = np.argmax(mu)
 mu_star = np.max(mu)
+print("The best arm has the reward of %d")%np.max(reward)
 #print(highest_mean)
 #print(np.sort(mu))
 
@@ -42,7 +44,7 @@ print(np.max(round_sum))
 
 # test algorithms
 # regret, regret_t,reward = epsilon_greedy(data, epsilon=None)
-regret_t,reward = UCB(data,partial,alpha,mu_star)
+regret, regret_t,reward = UCB(data,partial,alpha,mu_star)
 #regret, regret_t, reward = Thompson_sampling(data,partial, mu_star)
 
 # for e in range(2,10,2):
@@ -53,9 +55,9 @@ plot_(reward, output_path, num_skip = 20, name = 'reward')
 plot_(regret, output_path, num_skip = 20, name = 'regret')
 plot_(regret_t, output_path, num_skip = 20, name = 'mean_regret')
 
-print(reward[-10:])
-print(regret[-10:])
-print(regret_t[-10:])
+#print(reward[-10:])
+#print(regret[-10:])
+#print(regret_t[-10:])
 # plt.plot(regret_t[20:])
 # plt.show()
 
