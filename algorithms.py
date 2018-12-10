@@ -24,8 +24,9 @@ def epsilon_greedy(data, best_arm, epsilon=None):
 
 		reward[t] = reward[t-1]+data[choice,t]
 		reward_best[t] = reward_best[t-1] + data[best_arm,t]
-		regret[t] = (reward_best[t] - reward_UCB[t])/t
+		regret[t] = (reward_best[t] - reward[t])/t
 		regret_t[t] = regret[t]/t
+
 		n[choice] += 1
 		mu[choice] += ((n[choice]-1)*mu[choice]+data[choice,t])/n[choice]
 
@@ -112,7 +113,7 @@ def Thompson_sampling(data,partial,best_arm):
 		if(t>0):
 			reward_Tho[t] = reward_Tho[t-1] + r_t
 			reward_best[t] = reward_best[t-1] + data[best_arm,t]
-			regret[t] = regret[t-1]+(reward_best[t] - reward_Tho[t])/t
+			regret[t] = (reward_best[t] - reward_Tho[t])/t
 			regret_t[t] = regret[t]/t
 		else:
 			reward_Tho[t] = r_t

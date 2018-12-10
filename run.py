@@ -20,7 +20,8 @@ def plot_(data, output_path, num_skip = 20, name = 'regret'):
 # parameters to be set
 #path = '/Users/galaxydirector/Desktop/Ad-Recommendation/yahoo_ad_clicks.csv'
 path = './yahoo_ad_clicks.csv'
-partial = True # True to be partial feedback, False to be full feedback
+# partial = True # True to be partial feedback, False to be full feedback
+partial = False
 alpha = 2 # larger alpha indicates more preference to exploration
 
 # data import
@@ -42,17 +43,20 @@ print(np.max(round_sum))
 
 
 # test algorithms
-# regret, regret_t,reward = epsilon_greedy(data, epsilon=None)
+# regret, regret_t,reward = epsilon_greedy(data, best_arm, epsilon=None)
 regret, regret_t,reward = UCB(data,partial,alpha,best_arm)
 # regret, regret_t, reward = Thompson_sampling(data,partial, best_arm)
+output_path = './full_feedback'
 
 # for e in range(2,10,2):
-# 	regret, regret_t,reward = epsilon_greedy(data, epsilon=e/10)
+# 	regret, regret_t,reward = epsilon_greedy(data, best_arm, epsilon=e/10)
 # 	output_path = './greedy_{}'.format(e)
-output_path = './UCB_huang2'
+
 plot_(reward, output_path, num_skip = 20, name = 'reward')
 plot_(regret, output_path, num_skip = 20, name = 'regret')
 plot_(regret_t, output_path, num_skip = 20, name = 'mean_regret')
+
+print("terminal reward",regret[-1])
 
 #print(reward[-10:])
 #print(regret[-10:])
