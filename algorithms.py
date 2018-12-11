@@ -64,33 +64,49 @@ def UCB(data, partial,alpha,best_arm):
 
 	return regret, regret_t, reward_UCB
 
-def UCB_pro(data, initial_rounds):
+
+def UCB_pro(data, alpha, best_arm, epsilon=None):
 	'''
 	data: 50 x 32657 numpy array
 	partial: boolean to indicate if it is partial feedback or full feedback
 	'''
 	m,T = data.shape
 	# the mean
-	mu = np.mean(data[:,0:initial_rounds],axis=1)
+	mu = data[:,0].astype(np.float)
 	# the test number 
 	n = np.ones(m)
-	regret = np.ones(T)
-	regret_t = np.ones(T)
-	reward = np.zeros(T)
-	ads = [x for x in range(m)]
-	for t in range(initial_rounds,T):
-		UCB = mu + np.sqrt(2*np.log(t)/n)
-		#UCB = UCB / np.sum(UCB)
-		#i_t = np.random.choice(ads,p=UCB)
-		i_t = np.argmax(UCB)
+	regret = np.zeros(T)
+	regret_t = np.zeros(T)
+	reward_UCB = np.zeros(T)
+	reward_best = np.zeros(T)
+	for t in range(1,T):
+		UCB = mu + np.sqrt(alpha*np.log(t)/2/n)
+
+		if epsilon is None:
+			epsilon = 1/t
+
+		if t <500:
+			if np.random.random()>epsilon:
+				if max(mu)==0:
+					i_t = np.random.randint(m)
+				else:
+					i_t = np.argmax(UCB)
+			else:
+				i_t = np.random.randint(m)
+		else:
+			i_t = np.argmax(UCB)
 		r_t = data[i_t,t]
-		reward[t] = reward[t-1]+r_t
-		regret[t] = regret[t-1]+ (np.max(mu)-mu[i_t])
+
+		reward_UCB[t] = reward_UCB[t-1] + r_t
+		reward_best[t] = reward_best[t-1] + data[best_arm,t]
+		regret[t] = (reward_best[t] - reward_UCB[t])/t
 		regret_t[t] = regret[t]/t
+
 		n[i_t] = n[i_t]+1
 		mu[i_t] = mu[i_t]+(r_t-mu[i_t])/n[i_t]
 
-	return regret, regret_t, reward
+
+	return regret, regret_t, reward_UCB
 
 
 def Thompson_sampling(data,partial,best_arm):
